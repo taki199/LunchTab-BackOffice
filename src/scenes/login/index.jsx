@@ -1,103 +1,67 @@
-    import React from 'react';
-    import { Box, Typography, TextField, Button, IconButton, Link } from '@mui/material';
-    import { useTheme } from '@mui/material/styles';
-    import LockIcon from '@mui/icons-material/Lock'; // Icon for password
-    import { Link as RouterLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchUser } from '../../features/userSlice';
+import { useNavigate } from 'react-router-dom';
+import coverImage from '../../assets/‘Dublin’ Hand-painted photography background, textured olive green plaster with umber & brighter pear green highlights - 80x120cm.jpg';
+import Message from '../../components/ErrorMessage';
 
-    const LoginPage = () => {
-    const theme = useTheme();
+const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [message, setMessage] = useState('');
 
-    return (
-        <Box
-        className="login_container"
-        sx={{
-            width: '100%',
-            minHeight: '100vh',
-            backgroundColor: theme.palette.common.white,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 20px',
-        }}
-        >
-        <Box className="login_form_container" sx={{
-            width: '900px',
-            height: '500px',
-            display: 'flex',
-            borderRadius: '10px',
-            boxShadow: `0px 3px 3px -2px ${theme.palette.grey[300]}, 0px 3px 4px 0px ${theme.palette.grey[300]}, 0px 1px 8px 0px ${theme.palette.grey[300]}`,
-        }}>
-            <Box className="left" sx={{
-            flex: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.common.white,
-            borderTopLeftRadius: '10px',
-            borderBottomLeftRadius: '10px',
-            padding: '0 40px',
-            }}>
-            <Box className="form_container" sx={{ display: 'grid', gap: '20px' }}>
-                <Typography variant="h4" color="primary" gutterBottom>
-                Login
-                </Typography>
-                <TextField
-                label="Username"
-                variant="outlined"
-                fullWidth
-                className="input"
-                InputProps={{ style: { borderRadius: '10px', border: `1px solid ${theme.palette.grey[300]}` } }}
-                />
-                <TextField
-                label="Password"
-                variant="outlined"
-                type="password"
-                fullWidth
-                className="input"
-                InputProps={{ style: { borderRadius: '10px', border: `1px solid ${theme.palette.grey[300]}` } }}
-                />
-                <Button variant="contained" color="primary" fullWidth component={RouterLink} to="/dashboard">
-                Login
-                </Button>
-                <Link component={RouterLink} to="/forgot-password" variant="body2" sx={{ color: theme.palette.primary.main }}>
-                Forgot password?
-                </Link>
-            </Box>
-            </Box>
-            <Box className="right" sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.palette.secondary.main,
-            borderTopRightRadius: '10px',
-            borderBottomRightRadius: '10px',
-            padding: '0 40px',
-            }}>
-            <Typography variant="h4" color="white" gutterBottom>
-            LaunchTab
-            </Typography>
-            <Typography variant="body1" color="white" paragraph>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde voluptate possimus quas!
-            </Typography>
-            </Box>
-        </Box>
-        {/* Logo */}
-        <IconButton
-            sx={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            color: theme.palette.success.main,
-            }}
-        >
-            {/* Replace 'Logo' with your logo component or image */}
-            LaunchTab
-        </IconButton>
-        </Box>
-    );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const user = await dispatch(fetchUser(credentials));
+      if (user) {
+        setMessage('Login successful!');
+        navigate('/dashboard');
+      } else {
+        setMessage('Invalid credentials');
+      }
+    } catch (error) {
+      setMessage('Login failed. Please try again.');
     }
+  };
 
-    export default LoginPage;
+  return (
+    <div className='w-full h-screen flex items-start bg-white'>
+      <div className='relative w-1/2 h-full flex flex-col items-center'>
+        <div className='absolute top-20  flex flex-col  text-white'>
+          <h1 className='text-4xl font-extrabold my-4 text-[white]'> LaunchTab</h1>
+        </div>
+        <img src={coverImage} className='w-full h-full object-cover' alt='Cover' />
+      </div>
+      <div className='w-full h-full bg-white flex flex-col justify-center items-center p-14'>
+        <h1 className='text-[#28AF61] text-lg font-semibold mb-4'>LaunchTab</h1>
+        <div className='w-full max-w-md flex flex-col mb-4'>
+          <h3 className='text-3xl font-semibold mb-2 text-black'>Login</h3>
+          <Message type={message ? (message.startsWith('Login successful') ? 'success' : 'error') : ''} message={message} />
+          <form onSubmit={handleSubmit}>
+            <input
+              type='email'
+              placeholder="Email"
+              className='w-full text-black py-2 px-4 my-2 bg-gray-200 border border-gray-300 rounded-md outline-none focus:ring focus:ring-gray-400'
+              onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+              value={credentials.email}
+              name="email"
+            />
+            <input
+              type='password'
+              placeholder='Password'
+              className='w-full text-black py-2 px-4 my-2 bg-gray-200 border border-gray-300 rounded-md outline-none focus:ring focus:ring-gray-400'
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+              value={credentials.password}
+              name="password"
+            />
+            <button type="submit" className="w-full max-w-md bg-[green] text-white py-3 px-6 rounded-md hover:bg-[#28AF61] transition duration-300">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginForm;

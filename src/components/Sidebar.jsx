@@ -23,6 +23,7 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FlexBetween from './FlexBetween';
 import profileImage from "../assets/profile.jpg";
+import { useSelector } from 'react-redux'; // Import useSelector to access Redux store
 
 const navItems = [
     {
@@ -75,13 +76,12 @@ const navItems = [
     },
   ];
 
-
-const Sidebar = ({ user, drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) => {
+const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) => {
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
+  const user = useSelector((state) => state.user.user); // Access user data from Redux store
   const navigate = useNavigate();
   const theme = useTheme();
-
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
@@ -168,7 +168,7 @@ const Sidebar = ({ user, drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobi
               <Box
                 component="img"
                 alt="profile"
-                src={profileImage}
+                src={user.profilePhoto.url}
                 height="40px"
                 width="40px"
                 borderRadius="50%"
@@ -180,13 +180,13 @@ const Sidebar = ({ user, drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobi
                   fontSize="0.9rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  Houcine
+                  {user && user.username} {/* Display user name */}
                 </Typography>
                 <Typography
                   fontSize="0.8rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  Developer
+                  Admin {/* Display user role */}
                 </Typography>
               </Box>
               <SettingsOutlined
