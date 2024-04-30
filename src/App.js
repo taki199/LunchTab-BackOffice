@@ -6,11 +6,10 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Layout from "./scenes/layout";
 import Dashboard from "./scenes/dashboard";
 import Login from "./scenes/login";
-import { fetchUser } from "./features/userSlice";
 import Admin from './scenes/admin';
+import { fetchUser } from "./features/userSlice";
 
 function App() {
-  const mode = useSelector((state) => state.global.mode);
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const dispatch = useDispatch();
 
@@ -23,6 +22,7 @@ function App() {
     }
   }, [dispatch]);
 
+  const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
 
   return (
@@ -31,15 +31,24 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-            <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={isAuthenticated ? <Layout><Admin /></Layout> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={isAuthenticated ? <Layout><Dashboard /></Layout> : <Navigate to="/login" />} />
+            <Route element={<Login />} path="/login" />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<Admin />} />
+            </Route>
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
     </div>
   );
+}
+
+// ProtectedRoute component to handle authentication
+function ProtectedRoute() {
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  
+  return isAuthenticated ? <Layout /> : <Navigate to="/login" />;
 }
 
 export default App;

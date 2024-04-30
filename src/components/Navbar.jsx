@@ -1,30 +1,35 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import { LightModeOutlined, DarkModeOutlined, Menu as MenuIcon, Search, SettingsOutlined, ArrowDropDownOutlined } from '@mui/icons-material';
 import FlexBetween from './FlexBetween';
 import { useDispatch } from 'react-redux';
 import { setMode } from '../state';
 import profileImage from "../assets/profile.jpg";
-import { AppBar, IconButton, InputBase, Toolbar,useTheme,Box,Menu,MenuItem,Button,Typography } from '@mui/material'
+import { AppBar, IconButton, InputBase, Toolbar, useTheme, Box, Menu, MenuItem, Button, Typography } from '@mui/material'
 
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom'; // Import useLocation
+import { useLocation } from 'react-router-dom';
 
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const dispatch = useDispatch();
-    const { pathname } = useLocation(); // Access pathname from useLocation
-    const user = useSelector((state) => state.user.user);
-
+    const { pathname } = useLocation();
     const [anchorEl, setAnchorEl] = useState(null);
-    const [active, setActive] = useState(""); // Define setActive
+    const [active, setActive] = useState("");
     const isOpen = Boolean(anchorEl);
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
+    const theme = useTheme();
+    const user = useSelector((state) => state.user.user); // Access user data from Redux store
 
     useEffect(() => {
         setActive(pathname.substring(1));
     }, [pathname]);
 
-    const theme = useTheme();
+    // Default user data if not available from the backend
+    const defaultUser = {
+        username: "Guest",
+        profilePhoto: { url: "default-profile-image.jpg" },
+        role: "Guest",
+    };
 
     return (
         <AppBar
@@ -80,7 +85,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             <Box
                                 component="img"
                                 alt="profile"
-                                src={user.profilePhoto.url}
+                                src={(user && user.profilePhoto && user.profilePhoto.url) || defaultUser.profilePhoto.url}
                                 height="32px"
                                 width="32px"
                                 borderRadius="50%"
@@ -92,13 +97,13 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                     fontSize="0.85rem"
                                     sx={{ color: theme.palette.secondary[100] }}
                                 >
-                                    {user && user.username} {/* Display user name */}
+                                    {(user && user.username) || defaultUser.username}
                                 </Typography>
                                 <Typography
                                     fontSize="0.75rem"
                                     sx={{ color: theme.palette.secondary[200] }}
                                 >
-                                    Admin  {/* Display user role */}
+                                    Admin
                                 </Typography>
                             </Box>
                             <ArrowDropDownOutlined
@@ -120,4 +125,4 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     );
 };
 
-export default Navbar; 
+export default Navbar;

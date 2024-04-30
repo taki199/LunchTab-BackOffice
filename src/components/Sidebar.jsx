@@ -23,7 +23,7 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FlexBetween from './FlexBetween';
 import profileImage from "../assets/profile.jpg";
-import { useSelector } from 'react-redux'; // Import useSelector to access Redux store
+import { useSelector } from 'react-redux';
 
 const navItems = [
     {
@@ -79,12 +79,19 @@ const navItems = [
 const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) => {
   const { pathname } = useLocation();
   const [active, setActive] = useState("");
-  const user = useSelector((state) => state.user.user); // Access user data from Redux store
+  const user = useSelector((state) => state.user.user || {}); // Access user data from Redux store, initialize with empty object if not available
   const navigate = useNavigate();
   const theme = useTheme();
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
+
+  // Default user data if not available from the Redux store
+  const defaultUser = {
+    username: "Guest",
+    profilePhoto: { url: "default-profile-image.jpg" },
+    role: "Guest",
+  };
 
   return (
     <Box component="nav">
@@ -168,7 +175,7 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
               <Box
                 component="img"
                 alt="profile"
-                src={user.profilePhoto.url}
+                src={(user.profilePhoto && user.profilePhoto.url) || defaultUser.profilePhoto.url} // Use user profile photo if available, otherwise default
                 height="40px"
                 width="40px"
                 borderRadius="50%"
@@ -180,13 +187,13 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
                   fontSize="0.9rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  {user && user.username} {/* Display user name */}
+                  {(user.username) || defaultUser.username} {/* Display user name */}
                 </Typography>
                 <Typography
                   fontSize="0.8rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  Admin {/* Display user role */}
+                  {(user.role) || defaultUser.role} {/* Display user role */}
                 </Typography>
               </Box>
               <SettingsOutlined
