@@ -1,55 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllUsers } from "../../features/userSlice";
 import Header from "../../components/Header";
 import CustomColumnMenu from "../../components/DataGridCustomColumnMenu";
+import Avatar from "@mui/material/Avatar";
 
 const Admin = () => {
-  // Accessing theme object from MUI
+  const dispatch = useDispatch();
+  const { users, loading } = useSelector((state) => state.user);
   const theme = useTheme();
 
-  // Static dummy data for demonstration
-  const users = [
-    {
-      id: 1, // Unique id added manually
-      _id: "1",
-      username: "JohnDoe",
-      email: "john@example.com",
-      phoneNumber: "1234567890",
-      country: "USA",
-      occupation: "Developer",
-      isAdmin: true,
-      isDeleted: false,
-      profilePhoto: { url: "https://example.com/profile.jpg" },
-      createdAt: new Date().toDateString(),
-    },
-    {
-      id: 2, // Unique id added manually
-      _id: "2",
-      username: "JaneDoe",
-      email: "jane@example.com",
-      phoneNumber: "9876543210",
-      country: "Canada",
-      occupation: "Designer",
-      isAdmin: false,
-      isDeleted: false,
-      profilePhoto: { url: "https://example.com/profile.jpg" },
-      createdAt: new Date().toDateString(),
-    },
-    {
-        id: 3, // Unique id added manually
-        _id: "3",
-        username: "JaneDoe",
-        email: "jane@example.com",
-        phoneNumber: "9876543210",
-        country: "Canada",
-        occupation: "Designer",
-        isAdmin: false,
-        isDeleted: false,
-        profilePhoto: { url: "https://example.com/profile.jpg" },
-        createdAt: new Date().toDateString(),
-      },
-  ];
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
   // Column definitions for the DataGrid
   const columns = [
@@ -59,47 +24,51 @@ const Admin = () => {
       flex: 1,
     },
     {
+      field: "avatar",
+      headerName: "Avatar",
+      flex: 0.5,
+      renderCell: (params) => (
+        <Avatar alt={params.row.username} src={params.row.profilePhoto.url} /> // Update src attribute
+      ),
+    },
+    {
       field: "username",
       headerName: "Username",
       flex: 0.5,
     },
     {
-        field: "email",
-        headerName: "email",
-        flex: 0.5,
-      },
-      {
-        field: "country",
-        headerName: "country",
-        flex: 0.5,
-      },
-      {
-        field: "createdAt",
-        headerName: "createdAt",
-        flex: 0.5,
-      },
+      field: "email",
+      headerName: "Email",
+      flex: 0.5,
+    },
+    {
+      field: "country",
+      headerName: "Country",
+      flex: 0.5,
+    },
+    {
+      field: "createdAt",
+      headerName: "Created At",
+      flex: 0.5,
+    },
   ];
 
   return (
     <Box m="1.5rem 2.5rem">
-      {/* Header component with title and subtitle */}
       <Header title="ADMINS" subtitle="Managing admins and list of admins" />
-      <Box
-        mt="40px"
-        height="75vh"
-        sx={{
-          // Your styling
-        }}
-      >
-        {/* DataGrid component from MUI X */}
-        <DataGrid
-          loading={false} // Since it's static data, loading is always false
-          rows={users}
-          columns={columns}
-          components={{
-            ColumnMenu: CustomColumnMenu,
-          }}
-        />
+      <Box mt="40px" height="75vh">
+        {users.data ? (
+          <DataGrid
+            loading={loading}
+            rows={users.data}
+            columns={columns}
+            components={{
+              ColumnMenu: CustomColumnMenu,
+            }}
+          />
+        ) : (
+          <p>Loading...</p>
+        )}
       </Box>
     </Box>
   );

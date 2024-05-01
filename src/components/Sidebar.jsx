@@ -193,7 +193,7 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
                   fontSize="0.8rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  {(user.role) || defaultUser.role} {/* Display user role */}
+                  Admin
                 </Typography>
               </Box>
               <SettingsOutlined
