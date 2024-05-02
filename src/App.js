@@ -9,6 +9,8 @@ import Login from "./scenes/login";
 import Admin from './scenes/admin';
 import { fetchUser } from "./features/userSlice";
 import Orders from "./scenes/orders";
+import Customer from "./scenes/customer"
+import Dish from './scenes/Dish'; 
 
 
 function App() {
@@ -39,6 +41,9 @@ function App() {
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/admin" element={<Admin />} />
     <Route path="/orders" element={<Orders />} /> {/* Add the Orders route */}
+    <Route path="/customers" element={<Customer />} />
+    <Route path="/products" element={<Dish />} /> 
+    
   </Route>
 </Routes>
         </ThemeProvider>
