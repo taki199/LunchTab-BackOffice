@@ -8,6 +8,8 @@ import Dashboard from "./scenes/dashboard";
 import Login from "./scenes/login";
 import Admin from './scenes/admin';
 import { fetchUser } from "./features/userSlice";
+import Orders from "./scenes/orders";
+
 
 function App() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -31,13 +33,14 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-            <Route element={<Login />} path="/login" />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<Admin />} />
-            </Route>
-          </Routes>
+  <Route element={<Login />} path="/login" />
+  <Route element={<ProtectedRoute />}>
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/admin" element={<Admin />} />
+    <Route path="/orders" element={<Orders />} /> {/* Add the Orders route */}
+  </Route>
+</Routes>
         </ThemeProvider>
       </BrowserRouter>
     </div>

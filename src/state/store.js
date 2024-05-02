@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '../features/userSlice'; // Update the path to correctly import userSlice
-import globalReducer from '../state/index'; // Import globalReducer from its correct location
+import userReducer from '../features/userSlice';
+import orderReducer from '../features/orderSlice'; // Import the orderReducer
+import globalReducer from '../state/index';
 
 const store = configureStore({
   reducer: {
-    // Add your other slices here if you have them
     user: userReducer,
-    global: globalReducer, // Use the imported globalReducer here
-    
+    order: orderReducer, // Add the orderReducer to the store
+    global: globalReducer,
   },
 });
 

@@ -1,9 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{html,js}',
-    './components/**/*.{html,js}',
-    './src/scenes/login/**/*.{js,jsx}', // Include login page files
+  'node_modules/flowbite-react/lib/esm/**/*.js',
+  './pages/**/*.{html,js}',
+  './components/**/*.{html,js}',
+  './src/scenes/**/*.{js,jsx}', // Changed to target all files within the 'scenes' directory
   ],
+  plugins: [
+    require('flowbite/plugin')
+]
   // ...
-}
+ }
+ 
