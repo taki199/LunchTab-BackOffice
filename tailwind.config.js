@@ -8,7 +8,14 @@ module.exports = {
   ],
   plugins: [
     require('flowbite/plugin')
-]
+],
+theme: {
+  extend: {
+     fontFamily: {
+        'poppins': ['Poppins'],
+     }
+  }
+},
   // ...
  }
  

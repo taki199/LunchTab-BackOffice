@@ -1,18 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '../features/userSlice';
-import orderReducer from '../features/orderSlice'; // Import the orderReducer
+import orderReducer from '../features/orderSlice';
 import globalReducer from '../state/index';
 import customerReducer from '../features/customerSlice';
-import dishReducer from '../features/dishSlice'
-
+import dishReducer from '../features/dishSlice';
+import categoryReducer from '../features/categorySlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer,
-    order: orderReducer, // Add the orderReducer to the store
+    order: orderReducer,
     global: globalReducer,
     customer: customerReducer,
-    dish: dishReducer,  // Use the imported globalReducer here
+    dish: dishReducer,
+    category: categoryReducer,
   },
 });
 

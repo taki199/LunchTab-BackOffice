@@ -17,7 +17,7 @@ export const orderApi = {
       throw new Error(error.response.data.message);
     }
   },
-  getAllOrders: async () => {
+  getAllOrdersCtrl: async () => {
     try {
       const userData = localStorage.getItem('userData');
       const { token } = JSON.parse(userData);

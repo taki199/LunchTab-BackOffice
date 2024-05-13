@@ -24,6 +24,7 @@ import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FlexBetween from './FlexBetween';
 import profileImage from "../assets/profile.jpg";
 import { useSelector } from 'react-redux';
+import Logo from './Logo'
 
 const navItems = [
     {
@@ -109,16 +110,17 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
               boxSizing: "border-box",
               borderWidth: isNonMobile ? 0 : "2px",
               width: drawerWidth,
+             
             },
           }}
         >
-          <Box width="100%">
+          <Box width="100%" marginTop={"-20px"}>
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
-                <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    LaunchTab
-                  </Typography>
+                <Box display="flex" alignItems="center" >
+                  
+                    <Logo/>
+                  
                 </Box>
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>

@@ -24,8 +24,8 @@ export const fetchAllOrders = createAsyncThunk(
   "order/fetchAllOrders",
   async (_, thunkAPI) => {
     try {
-      const orders = await orderApi.getAllOrders();
-      return orders;
+      const response = await orderApi.getAllOrdersCtrl();
+      return response.orders; // Assuming response is an object with an 'orders' property
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

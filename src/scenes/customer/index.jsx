@@ -21,38 +21,54 @@ const Customer = () => {
   };
 
   const columns = [
-    {
-      field: "_id",
-      headerName: "ID",
-      flex: 1,
-    },
+    // {
+    //   field: "_id",
+    //   headerName: "ID",
+    //   flex: 1,
+    // },
     {
       field: "avatar",
       headerName: "Avatar",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
       renderCell: (params) => (
-        <Avatar alt={params.row.username} src={params.row.profilePhoto.url} /> // Use Avatar component to display the image
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <Avatar 
+            alt={params.row.username} 
+            src={params.row.profilePhoto.url} 
+            style={{ 
+              width: 'auto', // Let the browser determine the width based on the aspect ratio
+              height: '100%', // Use 100% height to ensure Avatar fits within the cell
+            }} 
+          />
+        </div>
       ),
     },
+    
+    
     {
       field: "username",
       headerName: "Username",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
       field: "email",
       headerName: "Email",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
       field: "createdAt",
       headerName: "Created At",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
       field: "update",
       headerName: "Update",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
       renderCell: () => (
         <IconButton
           className="border rounded-full p-2 transition-colors duration-300 hover:border-green-500"
@@ -66,6 +82,7 @@ const Customer = () => {
       field: "delete",
       headerName: "Delete",
       flex: 0.5,
+      headerClassName: 'font-bold text-lg font-[poppins] ',
       renderCell: (params) => (
         <IconButton
           className="border rounded-full p-2 transition-colors duration-300 hover:border-yellow-500"
@@ -90,6 +107,7 @@ const Customer = () => {
             components={{
               ColumnMenu: CustomColumnMenu,
             }}
+            rowStyle={{ height: 100 }} // Set the row height here
           />
         ) : (
           <p>Loading...</p>

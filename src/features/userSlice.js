@@ -25,18 +25,55 @@ export const fetchAllUsers = createAsyncThunk(
   }
 );
 
+export const createUser = createAsyncThunk(
+  "user/createUser",
+  async (userData, thunkAPI) => {
+    try {
+      const newUser = await userApi.registerUserCtrl(userData);
+      return newUser;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const setAuthenticated = (isAuthenticated) => {
+  return {
+    type: 'user/setAuthenticated',
+    payload: isAuthenticated,
+  };
+};
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
     isAuthenticated: false,
     user: null,
-    users: [], // Add a users array to the state
+    users: [],
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    logoutUser: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      localStorage.removeItem('userData');
+    },
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // Handle user creation success without affecting current user state
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -66,4 +103,5 @@ const userSlice = createSlice({
   },
 });
 
+export const { logoutUser } = userSlice.actions;
 export default userSlice.reducer;

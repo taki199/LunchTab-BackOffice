@@ -7,22 +7,37 @@ import Layout from "./scenes/layout";
 import Dashboard from "./scenes/dashboard";
 import Login from "./scenes/login";
 import Admin from './scenes/admin';
-import { fetchUser } from "./features/userSlice";
+import { fetchUser, setAuthenticated } from "./features/userSlice";
 import Orders from "./scenes/orders";
-import Customer from "./scenes/customer"
-import Dish from './scenes/Dish'; 
+import Customer from "./scenes/customer";
+import Dish from './scenes/Dish';
+import Category from './scenes/category';
 
 
-function App() {
+export default function App() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check if user data is stored in localStorage
+    console.log("App component mounted");
+    console.log("useEffect triggered");
+
+
     const userData = localStorage.getItem('userData');
+    console.log("userData from local storage:", userData);
+
     if (userData) {
-      // Dispatch action to set user data from localStorage to the store
-      dispatch(fetchUser(JSON.parse(userData)));
+      // Parse user data from local storage
+      const parsedUserData = JSON.parse(userData);
+      console.log("Parsed user data:", parsedUserData);
+
+      // Dispatch action to set isAuthenticated to true and populate user data
+      dispatch(setAuthenticated(true));
+      dispatch(fetchUser(parsedUserData));
+    } else {
+      // No user data found, set isAuthenticated to false
+      console.log("No user data found in local storage");
+      dispatch(setAuthenticated(false));
     }
   }, [dispatch]);
 
@@ -35,28 +50,28 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-  <Route element={<Login />} path="/login" />
-  <Route element={<ProtectedRoute />}>
-    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-    <Route path="/dashboard" element={<Dashboard />} />
-    <Route path="/admin" element={<Admin />} />
-    <Route path="/orders" element={<Orders />} /> {/* Add the Orders route */}
-    <Route path="/customers" element={<Customer />} />
-    <Route path="/products" element={<Dish />} /> 
-    
-  </Route>
-</Routes>
+            <Route element={<Login />} path="/login" />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/customers" element={<Customer />} />
+              <Route path="/products" element={<Dish />} />
+              <Route path="/category" element={<Category />} />
+            </Route>
+          </Routes>
         </ThemeProvider>
       </BrowserRouter>
     </div>
   );
 }
 
-// ProtectedRoute component to handle authentication
+// Define ProtectedRoute component
 function ProtectedRoute() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  
+  console.log("isAuthenticated:", isAuthenticated);
+
   return isAuthenticated ? <Layout /> : <Navigate to="/login" />;
 }
 
-export default App;
