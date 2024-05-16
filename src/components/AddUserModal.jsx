@@ -7,10 +7,11 @@ import { createUser, fetchAllUsers } from '../features/userSlice';
 const AddUserModal = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
+
   useEffect(() => {
     dispatch(fetchAllUsers()); // Fetch all users when the component mounts
   }, [dispatch]);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedUserData = { ...userData, [name]: value };
@@ -30,8 +31,6 @@ const AddUserModal = ({ open, setOpen }) => {
   const handleClose = () => {
     setOpen(false);
   };
-
-
 
   return (
     <Dialog open={open} onClose={handleClose}>

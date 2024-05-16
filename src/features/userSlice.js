@@ -24,6 +24,18 @@ export const fetchAllUsers = createAsyncThunk(
     }
   }
 );
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async (userId, thunkAPI) => {
+    try {
+      await userApi.deleteUserProfileCtrl(userId);
+      return userId; // Return the deleted user's ID
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -49,7 +61,7 @@ const userSlice = createSlice({
   initialState: {
     isAuthenticated: false,
     user: null,
-    users: [],
+    users: [], // Initialize users as an empty array
     loading: false,
     error: null,
   },
@@ -94,12 +106,33 @@ const userSlice = createSlice({
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
-      })
+        state.users = action.payload; 
+      })      
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.loading = false;
+        const { success, data } = action.payload;
+        if (success) {
+          const deletedUserId = data._id; // Assuming the user ID is stored in the _id field
+          state.users = state.users.filter(user => user._id !== deletedUserId);
+        } else {
+          // Handle deletion failure if needed
+        }
+      })
+           
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+  
   },
 });
 

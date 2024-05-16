@@ -4,10 +4,11 @@ import FlexBetween from './FlexBetween';
 import { useDispatch } from 'react-redux';
 import { setMode } from '../state';
 import profileImage from "../assets/profile.jpg";
-import { AppBar, IconButton, InputBase, Toolbar, useTheme, Box, Menu, MenuItem, Button, Typography } from '@mui/material'
-
+import { AppBar, IconButton, InputBase, Toolbar, useTheme, Box, Menu, MenuItem, Button, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const dispatch = useDispatch();
@@ -116,9 +117,8 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             onClose={handleClose}
                             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                         >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
+                            <MenuItem component={Link} to="/profile">Profile</MenuItem>
                             <MenuItem onClick={handleClose}>Log Out</MenuItem>
-                            
                         </Menu>
                     </FlexBetween>
                 </FlexBetween>

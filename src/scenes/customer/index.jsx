@@ -1,16 +1,17 @@
 import React, { useEffect } from "react";
-import { Box, Avatar } from "@mui/material"; // Import Avatar component
+import { Box, Avatar, IconButton, useTheme, Button, Grid } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllCustomers, deleteCustomer } from "../../features/customerSlice";
 import Header from "../../components/Header";
-import CustomColumnMenu from "../../components/DataGridCustomColumnMenu";
-import { IconButton } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Update, Add } from "@mui/icons-material";
 
 const Customer = () => {
   const dispatch = useDispatch();
   const { customers, loading } = useSelector((state) => state.customer);
+  const theme = useTheme();
 
   useEffect(() => {
     dispatch(fetchAllCustomers());
@@ -19,78 +20,61 @@ const Customer = () => {
   const handleDelete = (customerId) => {
     dispatch(deleteCustomer(customerId));
   };
+  const handleUpdateClick=(customerId)=>{
+    console.log(customerId)
+  }
 
   const columns = [
-    // {
-    //   field: "_id",
-    //   headerName: "ID",
-    //   flex: 1,
-    // },
     {
       field: "avatar",
       headerName: "Avatar",
       flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
       renderCell: (params) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          <Avatar 
-            alt={params.row.username} 
-            src={params.row.profilePhoto.url} 
-            style={{ 
-              width: 'auto', // Let the browser determine the width based on the aspect ratio
-              height: '100%', // Use 100% height to ensure Avatar fits within the cell
-            }} 
-          />
-        </div>
+        <Avatar 
+          alt={params.row.username} 
+          src={params.row.profilePhoto.url} 
+          sx={{ width: 60, height: 60 }}
+        />
       ),
     },
-    
-    
     {
       field: "username",
       headerName: "Username",
       flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
       field: "email",
       headerName: "Email",
       flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
       field: "createdAt",
       headerName: "Created At",
       flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
     },
     {
-      field: "update",
-      headerName: "Update",
+      field: "actions",
+      headerName: "Actions",
       flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
-      renderCell: () => (
-        <IconButton
-          className="border rounded-full p-2 transition-colors duration-300 hover:border-green-500"
-          style={{ color: '#27834E' }}
-        >
-          <Edit />
-        </IconButton>
-      ),
-    },
-    {
-      field: "delete",
-      headerName: "Delete",
-      flex: 0.5,
-      headerClassName: 'font-bold text-lg font-[poppins] ',
       renderCell: (params) => (
-        <IconButton
-          className="border rounded-full p-2 transition-colors duration-300 hover:border-yellow-500"
-          style={{ color: '#FFBD4A' }}
-          onClick={() => handleDelete(params.row._id)}
-        >
-          <Delete />
-        </IconButton>
+        <Box display="flex" justifyContent="center" marginTop={"16px"}>
+          <Button
+            variant="outlined"
+            startIcon={<Update />}
+            style={{ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary[500], color: 'white', marginRight: '8px' }}
+            onClick={() => handleUpdateClick(params.row._id)}
+          >
+            Update
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<DeleteIcon />}
+            style={{ backgroundColor: theme.palette.error.main, color: 'white' }}
+            onClick={() => handleDelete(params.row._id)}
+          >
+            Delete
+          </Button>
+        </Box>
       ),
     },
   ];
@@ -98,16 +82,18 @@ const Customer = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <Header title="CUSTOMERS" subtitle="Managing customers and list of customers" />
-      <Box mt="40px" height="75vh">
+      <Box mt="20px" display="flex" justifyContent="flex-end">
+        <Button variant="contained" startIcon={<Add />}  style={{ backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary[500], color: 'white', marginRight: '8px' }}>
+          Add Customer
+        </Button>
+      </Box>
+      <Box mt="20px" height="60vh">
         {customers.data ? (
           <DataGrid
             loading={loading}
             rows={customers.data}
             columns={columns}
-            components={{
-              ColumnMenu: CustomColumnMenu,
-            }}
-            rowStyle={{ height: 100 }} // Set the row height here
+            rowHeight={80} // Adjust the row height
           />
         ) : (
           <p>Loading...</p>

@@ -12,6 +12,7 @@ import Orders from "./scenes/orders";
 import Customer from "./scenes/customer";
 import Dish from './scenes/Dish';
 import Category from './scenes/category';
+import Profile from './scenes/Profile';
 
 
 export default function App() {
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="/customers" element={<Customer />} />
               <Route path="/products" element={<Dish />} />
               <Route path="/category" element={<Category />} />
+              <Route path='/profile' element={<Profile/>}/>
             </Route>
           </Routes>
         </ThemeProvider>
