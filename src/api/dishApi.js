@@ -25,7 +25,13 @@ export const dishApi = {
       const response = await axios.put(`http://localhost:5001/api/dishes/${id}`, credentials);
       return response.data;
     } catch (error) {
-      throw new Error(error.response.data.message);
+      // Check if error response and message exist
+      if (error.response && error.response.data && error.response.data.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        // Handle other types of errors
+        throw new Error('An error occurred while updating the dish.');
+      }
     }
   },
   // Delete a dish by ID

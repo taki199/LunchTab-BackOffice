@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { themeSettings } from "./theme";
 import { useSelector, useDispatch } from "react-redux";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate ,useParams} from "react-router-dom";
 import Layout from "./scenes/layout";
 import Dashboard from "./scenes/dashboard";
 import Login from "./scenes/login";
@@ -13,7 +13,9 @@ import Customer from "./scenes/customer";
 import Dish from './scenes/Dish';
 import Category from './scenes/category';
 import Profile from './scenes/Profile';
-
+import { Toast } from './components/Toast';
+import AddDishForm from './scenes/addDish'
+import UpdateDishForm from './scenes/updateDish';
 
 export default function App() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -22,7 +24,6 @@ export default function App() {
   useEffect(() => {
     console.log("App component mounted");
     console.log("useEffect triggered");
-
 
     const userData = localStorage.getItem('userData');
     console.log("userData from local storage:", userData);
@@ -59,21 +60,28 @@ export default function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/customers" element={<Customer />} />
               <Route path="/products" element={<Dish />} />
+              <Route path="/products/addDish" element={<AddDishForm />} />
+              <Route path="/products/updateDish/:dishId" element={<UpdateDishFormWrapper />} />
               <Route path="/category" element={<Category />} />
-              <Route path='/profile' element={<Profile/>}/>
+              <Route path='/profile/me' element={<Profile />} />
             </Route>
           </Routes>
         </ThemeProvider>
+        <Toast/>
       </BrowserRouter>
     </div>
   );
 }
+
+const UpdateDishFormWrapper = () => {
+  const { dishId } = useParams();
+  return <UpdateDishForm dishId={dishId} />;
+};
 
 // Define ProtectedRoute component
 function ProtectedRoute() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   console.log("isAuthenticated:", isAuthenticated);
 
-  return isAuthenticated ? <Layout /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Layout/> : <Navigate to="/login" />;
 }
-

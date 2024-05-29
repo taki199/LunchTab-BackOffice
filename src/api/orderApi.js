@@ -45,4 +45,37 @@ export const orderApi = {
       throw new Error(error.response.data.message);
     }
   },
+  updateOrderCtrl: async (orderData, id) => {
+    try {
+      const userData = localStorage.getItem('userData');
+      const { token } = JSON.parse(userData);
+
+      const response = await axios.put(`http://localhost:5001/api/orders/${id}`, orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  },
+  deleteOrderCtrl: async (orderId) => {
+    try {
+      const userData = localStorage.getItem('userData');
+      const { token } = JSON.parse(userData);
+
+      const response = await axios.delete(`http://localhost:5001/api/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  },
+
 };

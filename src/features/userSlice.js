@@ -24,6 +24,7 @@ export const fetchAllUsers = createAsyncThunk(
     }
   }
 );
+
 export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId, thunkAPI) => {
@@ -35,7 +36,6 @@ export const deleteUser = createAsyncThunk(
     }
   }
 );
-
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -49,6 +49,30 @@ export const createUser = createAsyncThunk(
   }
 );
 
+export const me = createAsyncThunk(
+  'user/me',
+  async (_, thunkAPI) => {
+    try {
+      const user = await userApi.getUserProfile();
+      return user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const changePhoto = createAsyncThunk(
+  "user/changePhoto",
+  async (formData, thunkAPI) => {
+    try {
+      const updatedUser = await userApi.profilePhotoUploaderCtrl(formData);
+      return updatedUser;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const setAuthenticated = (isAuthenticated) => {
   return {
     type: 'user/setAuthenticated',
@@ -57,11 +81,11 @@ export const setAuthenticated = (isAuthenticated) => {
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState: {
     isAuthenticated: false,
     user: null,
-    users: [], // Initialize users as an empty array
+    users: [],
     loading: false,
     error: null,
   },
@@ -78,7 +102,7 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createUser.fulfilled, (state, action) => {
+      .addCase(createUser.fulfilled, (state) => {
         state.loading = false;
         // Handle user creation success without affecting current user state
       })
@@ -111,7 +135,6 @@ const userSlice = createSlice({
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        
       })
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
@@ -119,20 +142,48 @@ const userSlice = createSlice({
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.loading = false;
-        const { success, data } = action.payload;
-        if (success) {
-          const deletedUserId = data._id; // Assuming the user ID is stored in the _id field
+        const deletedUserId = action.payload; // Assuming the payload is the deleted user's ID
+        if (Array.isArray(state.users)) {
           state.users = state.users.filter(user => user._id !== deletedUserId);
         } else {
-          // Handle deletion failure if needed
+          state.users = [];
         }
       })
-           
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
-  
+      })
+      .addCase(me.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(me.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(me.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(changePhoto.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePhoto.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update only the profile photo URL, not the entire user object
+        state.user.profilePhoto = action.payload.profilePhoto;
+      })
+      .addCase(changePhoto.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addMatcher(
+        (action) => action.type === 'user/setAuthenticated',
+        (state, action) => {
+          state.isAuthenticated = action.payload;
+        }
+      );
   },
 });
 

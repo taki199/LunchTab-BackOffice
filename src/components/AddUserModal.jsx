@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { red, green } from '@mui/material/colors';
+import CloseIcon from '@mui/icons-material/Close';
 import { createUser, fetchAllUsers } from '../features/userSlice';
 
 const AddUserModal = ({ open, setOpen }) => {
@@ -34,7 +35,12 @@ const AddUserModal = ({ open, setOpen }) => {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Add User</DialogTitle>
+      <DialogTitle style={{ borderBottom: '1px solid #e0e0e0' }}>
+        <span style={{ flexGrow: 1 }}>Add User</span>
+        <IconButton aria-label="close" onClick={handleClose}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -65,7 +71,7 @@ const AddUserModal = ({ open, setOpen }) => {
           onChange={handleChange}
         />
       </DialogContent>
-      <DialogActions>
+      <DialogActions style={{ borderTop: '1px solid #e0e0e0' }}>
         <Button onClick={handleClose} style={{ color: red[500] }}>
           Cancel
         </Button>
