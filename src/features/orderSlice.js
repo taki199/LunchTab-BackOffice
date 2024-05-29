@@ -19,6 +19,29 @@ export const fetchOrder = createAsyncThunk(
     }
   }
 );
+export const deleteOrder = createAsyncThunk(
+  "order/deleteOrder",
+  async (orderId, thunkAPI) => {
+    try {
+      await orderApi.deleteOrderCtrl(orderId);
+      return orderId; // Return the deleted orderId
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateOrderStatus = createAsyncThunk(
+  "order/updateOrder",
+  async ({ orderId, orderData }, thunkApi) => {
+    try {
+      const response = await orderApi.updateOrderCtrl(orderData, orderId);
+      return response; // Assuming the response contains the updated order object
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
 
 export const fetchAllOrders = createAsyncThunk(
   "order/fetchAllOrders",
@@ -85,7 +108,36 @@ const orderSlice = createSlice({
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.orders.findIndex(order => order._id === action.payload._id);
+        if (index !== -1) {
+          state.orders[index] = action.payload;
+        }
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        // Remove the deleted order from the orders array
+        state.orders = state.orders.filter(order => order._id !== action.payload);
+      })
+      .addCase(deleteOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+      
   },
 });
 

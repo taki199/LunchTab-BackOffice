@@ -1,31 +1,45 @@
-import * as React from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import { Box, Avatar } from "@mui/material";
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import Header from "../../components/Header";
-import Typography from '@mui/material/Typography';
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Pagination,
+} from '@mui/material';
+import Header from '../../components/Header';
+import CategoryModal from '../../components/CategoryModal'; // Import CategoryModal
 import { fetchAllCategories } from '../../features/categorySlice';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-export default function ImgMediaCard() {
+export default function Category() {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.category.categories);
 
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const handleSaveCategory = (categoryData) => {
+    // Handle saving the new category
+    console.log('Saved category:', categoryData);
+  };
   React.useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
 
   // Function to paginate categories
   const paginateCategories = (items, pageNumber, pageSize) => {
@@ -34,32 +48,41 @@ export default function ImgMediaCard() {
   };
 
   // Constants for pagination
-  const pageSize = 3;
+  const pageSize = 4;
   const totalPages = Math.ceil(categories.length / pageSize);
 
   // State for current page
   const [currentPage, setCurrentPage] = React.useState(1);
 
   // Function to handle page change
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   // Paginate categories for current page
   const paginatedCategories = paginateCategories(categories, currentPage, pageSize);
 
+  const handleAddCategory = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <Box m="1.5rem 5px">
-    <Header title="Category" subtitle={<Typography sx={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}>Managing category and list of categories</Typography>} />
+      <Header
+        title="Category"
+        subtitle={<Typography sx={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}>Managing category and list of categories</Typography>}
+      />
       <Box mt="20px" display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.5rem', fontFamily: 'Poppins' }}>Categories</Typography>
         <Box display="flex" alignItems="center">
-          <Button variant="contained" color="secondary" startIcon={<AddIcon />}>Add</Button>
+          <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={handleAddCategory}>
+            Add
+          </Button>
         </Box>
       </Box>
       <TableContainer component={Paper} style={{ marginTop: '20px' }}>
         <Table aria-label="categories table" sx={{ minWidth: 650 }}>
-        <TableHead>
+          <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Category</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Name</TableCell>
@@ -99,13 +122,22 @@ export default function ImgMediaCard() {
         </Table>
         {/* Pagination */}
         <Box mt="20px" display="flex" justifyContent="center">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <Button key={index} onClick={() => handlePageChange(index + 1)}>
-              {index + 1}
-            </Button>
-          ))}
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            siblingCount={1}
+            boundaryCount={1}
+            size="large"
+          />
         </Box>
       </TableContainer>
+      <CategoryModal
+       open={isModalOpen}
+       handleClose={handleCloseModal}
+       handleSave={handleSaveCategory}
+      />
     </Box>
   );
 }
