@@ -25,6 +25,7 @@ import FlexBetween from './FlexBetween';
 import profileImage from "../assets/profile.jpg";
 import { useSelector } from 'react-redux';
 import Logo from './Logo'
+import PsychologyIcon from '@mui/icons-material/Psychology';
 
 const navItems = [
     {
@@ -61,6 +62,10 @@ const navItems = [
     {
       text: "Daily",
       icon: <TodayOutlined />,
+    },
+    {
+      text: "Ai",
+      icon: <PsychologyIcon />,
     },
     {
       text: "Monthly",

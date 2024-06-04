@@ -10,6 +10,7 @@ export const customerApi = {
               Authorization: `Bearer ${token}`, 
           },
       });
+      console.log('API Response:', response.data); // Debugging
       return response.data;
     } catch (error) {
       throw new Error(error.response.data.message);
@@ -24,7 +25,7 @@ export const customerApi = {
       throw new Error(error.response.data.message);
     }
   },
-  
+
   deleteCustomerById: async (customerId) => {
     try {
       const userData = localStorage.getItem('userData');
@@ -53,5 +54,4 @@ export const customerApi = {
       throw new Error(error.response.data.message);
     }
   },
-  
 };

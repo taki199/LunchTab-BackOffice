@@ -20,6 +20,7 @@ export const fetchAllCategories = createAsyncThunk(
   }
 );
 
+// categorySlice.js
 export const createCategory = createAsyncThunk(
   'category/createCategory',
   async (categoryData, { rejectWithValue }) => {
@@ -31,6 +32,7 @@ export const createCategory = createAsyncThunk(
     }
   }
 );
+
 
 export const updateCategory = createAsyncThunk(
   'category/updateCategory',
@@ -83,6 +85,8 @@ const categorySlice = createSlice({
       .addCase(createCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.categories.push(action.payload);
+        console.log('Action payload (create fulfilled):', action.payload); // Add this line for debugging
+        state.categories = [...state.categories, action.payload];
       })
       .addCase(createCategory.rejected, (state, action) => {
         state.loading = false;

@@ -79,3 +79,18 @@ export const orderApi = {
   },
 
 };
+
+export const countOrder = async (token) => {
+  try {
+    const response = await axios.get(`http://localhost:5001/api/orders/my-count/my-orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error counting orders:', error);
+    throw error;
+  }
+};
+

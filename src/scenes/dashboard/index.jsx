@@ -1,193 +1,211 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
-import { mockTransactions } from "../../data/mockData";
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import LineChart from "../../components/LineChart";
-import ProgressCircle from "../../components/ProgressCircle";
-import StatBox from "../../components/StateBox";
-//import BarChart from "../../components/BarChart";
-import GeographyChart from "../../components/GeographyChart";
+import BasicChart from '../../components/BasicChart';
 import Header from "../../components/Header";
+import { fetchAllOrders } from '../../features/orderSlice';
+import { countOrder } from '../../api/orderApi';
+import { countDish } from '../../api/dishApi'; // Correctly import countDish function
+import { useDispatch, useSelector } from 'react-redux';
+import Chart from '../../components/Chart';
+import TotalSalesDisplay from '../../components/TotalSalesDisplay';
+import LineChart from '../../components/LineChartt';
 
 const Dashboard = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [monthlySales, setMonthlySales] = useState([]);
+  const [dishCount, setDishCount] = useState(0);
+  const [animatedDishCount, setAnimatedDishCount] = useState(0);
+
+  const { orders, loading } = useSelector((state) => state.order);
+  const error = useSelector((state) => state.order.error);
+
+  useEffect(() => {
+    dispatch(fetchAllOrders());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchTotalOrders = async () => {
+      try {
+        const count = await countOrder();
+        setTotalOrders(count);
+      } catch (error) {
+        console.error('Error fetching total orders count:', error);
+      }
+    };
+
+    fetchTotalOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchDishCount = async () => {
+      try {
+        const count = await countDish();
+        setDishCount(count);
+      } catch (error) {
+        console.error('Error fetching dish count:', error);
+      }
+    };
+
+    fetchDishCount();
+  }, []);
+
+  useEffect(() => {
+    let interval;
+    if (dishCount > 0) {
+      let count = 0;
+      interval = setInterval(() => {
+        count += 1;
+        setAnimatedDishCount(count);
+        if (count >= dishCount) {
+          clearInterval(interval);
+        }
+      }, 50); // Adjust the speed of the animation by changing the interval duration
+    }
+    return () => clearInterval(interval);
+  }, [dishCount]);
+
+  useEffect(() => {
+    const calculateMonthlySales = () => {
+      const monthlySalesMap = new Map();
+
+      orders.forEach(order => {
+        const createdAt = new Date(order.createdAt);
+        const monthYear = `${createdAt.getMonth() + 1}/${createdAt.getFullYear()}`;
+        const totalAmount = order.totalAmount;
+
+        if (monthlySalesMap.has(monthYear)) {
+          monthlySalesMap.set(monthYear, monthlySalesMap.get(monthYear) + totalAmount);
+        } else {
+          monthlySalesMap.set(monthYear, totalAmount);
+        }
+      });
+
+      const monthlySalesData = Array.from(monthlySalesMap, ([monthYear, totalSales]) => ({ monthYear, totalSales }));
+      setMonthlySales(monthlySalesData);
+    };
+
+    if (orders.length > 0) {
+      calculateMonthlySales();
+    }
+  }, [orders]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const totalSales = orders.reduce((acc, order) => acc + order.totalAmount, 0);
 
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-        <Box>
-          <Button
-            sx={{
-              backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400],
-              color: theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button>
-        </Box>
+        <Button
+          sx={{
+            backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400],
+            color: theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100],
+            fontSize: "14px",
+            fontWeight: "bold",
+            padding: "10px 20px",
+          }}
+        >
+          <DownloadOutlinedIcon sx={{ mr: "10px" }} />
+          Download Reports
+        </Button>
       </Box>
 
       {/* GRID & CHARTS */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
-        {/* ROW 1 */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="12,361"
-            subtitle="Emails Sent"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <EmailIcon sx={{ color: theme.palette.mode === "dark" ? theme.palette.green[300] : theme.palette.green[300], fontSize: "26px" }} />
-            }
-          />
-        </Box>
+      <Box mt="20px" display="flex" justifyContent="space-between">
+        {/* Left Side: Total Sales Chart and Summary Boxes */}
+        <Box width="48%">
+          <Typography variant="h6" mb="10px" fontWeight='bold'>
+            Total Sales Chart
+          </Typography>
+          <BasicChart orders={orders} />
 
-        {/* Additional StatBox components for ROW 1 */}
-
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400]}
-        >
+          {/* Total Sales Display */}
           <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
+            mt="20px"
+            backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : "black"}
+            width='100%'
+            height='100px'
+            borderRadius="8px"
+            p="20px"
+            display="flex"
             alignItems="center"
           >
             <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100]}
-              >
+              <Typography variant="h5" fontWeight="bold" color={theme.palette.mode === "light" ? theme.palette.white[700] : theme.palette.grey[100]}>
                 Revenue Generated
               </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.green[500]}
-              >
-                $59,342.32
+              <Typography variant="h3" fontWeight="bold" color={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.white[700]}>
+                <TotalSalesDisplay totalSales={totalSales} />
               </Typography>
             </Box>
+          </Box>
+
+          {/* Total Orders Display */}
+          <Box
+            mt="20px"
+            backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : "black"}
+            width='100%'
+            height='100px'
+            borderRadius="8px"
+            p="20px"
+            display="flex"
+            alignItems="center"
+          >
             <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.green[500] }}
-                />
-              </IconButton>
+            <Typography variant="h5" fontWeight="bold" color={theme.palette.mode === "light" ? theme.palette.white[700] : theme.palette.grey[100]}>
+                Total Orders
+              </Typography>
+              <Typography variant="h3" fontWeight="bold" color={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.white[700]}>
+                {totalOrders}
+              </Typography>
             </Box>
           </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
 
-        {/* Recent Transactions */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400]}
-          overflow="auto"
-        >
+          {/* Total Dishes Display */}
           <Box
+            mt="20px"
+            backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : "black"}
+            width='100%'
+            height='100px'
+            borderRadius="8px"
+            p="20px"
             display="flex"
-            justifyContent="space-between"
             alignItems="center"
-            borderBottom={`4px solid ${theme.palette.mode === "dark" ? theme.palette.primary[500] : theme.palette.secondary[500]}`}
-            p="15px"
           >
-            <Typography
-              color={theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100]}
-              variant="h5"
-              fontWeight="600"
-            >
-              Recent Transactions
-            </Typography>
-          </Box>
-          {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${theme.palette.mode === "dark" ? theme.palette.primary[500] : theme.palette.secondary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.green[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography
-                  color={theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100]}
-                >
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box color={theme.palette.mode === "dark" ? theme.palette.grey[100] : theme.palette.grey[100]}>
-                {transaction.date}
-              </Box>
-              <Box
-                backgroundColor={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.green[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
-              </Box>
+            <Box>
+            <Typography variant="h5" fontWeight="bold" color={theme.palette.mode === "light" ? theme.palette.white[700] : theme.palette.grey[100]}>
+                Total Dishes
+              </Typography>
+              <Typography variant="h3" fontWeight="bold" color={theme.palette.mode === "dark" ? theme.palette.green[500] : theme.palette.white[700]}>
+                {animatedDishCount}
+              </Typography>
             </Box>
-          ))}
+          </Box>
         </Box>
 
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={theme.palette.mode === "dark" ? theme.palette.primary[400] : theme.palette.secondary[400]}
-          p="30px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-          >
-            Campaign
+        {/* Right Side: Order Status Chart and Monthly Sales Chart */}
+        <Box width="48%">
+          <Typography variant="h6" mb="10px" fontWeight='bold'>
+            Order Status Chart
           </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              fontWeight="600"
-            >
-              $48,352 revenue generated
+          <Chart orders={orders} chartType="doughnut" />
+
+          <Box mt="20px">
+            <Typography variant="h6" mb="10px" fontWeight='bold'>
+              Monthly Sales Chart
             </Typography>
+            <LineChart data={monthlySales} />
           </Box>
         </Box>
       </Box>

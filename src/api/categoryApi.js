@@ -21,15 +21,15 @@ export const categoryApi = {
   },
 
   // Create a new category
-  createCategoryCtrl: async (categoryData) => {
+ createCategoryCtrl :async (categoryData) => {
     try {
       const userData = localStorage.getItem('userData');
       const { token } = JSON.parse(userData); // Parse JSON string to get token
-
+  
       const response = await axios.post(`http://localhost:5001/api/categories`, categoryData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', // Ensure the content type is set correctly
+          
         },
       });
       return response.data;

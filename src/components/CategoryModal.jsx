@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import { Box, Button, Modal, TextField, Typography, IconButton } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import {
+  Box,
+  Button,
+  Modal,
+  TextField,
+  Typography,
+  IconButton,
+  Grid,
+} from '@mui/material';
 import { styled } from '@mui/system';
 import CloseIcon from '@mui/icons-material/Close';
+import { createCategory } from '../features/categorySlice';
 
 const style = {
   position: 'absolute',
@@ -26,31 +36,59 @@ const Header = styled(Box)({
   mb: 2,
 });
 
-export default function CategoryModal({ open, handleClose, handleSave }) {
-  const [image, setImage] = useState(null);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+export default function CategoryModal({ open, handleClose }) {
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    image: null,
+  });
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   const handleImageChange = (event) => {
-    setImage(URL.createObjectURL(event.target.files[0]));
+    const imageFile = event.target.files[0];
+    setFormData((prevState) => ({
+      ...prevState,
+      image: imageFile,
+    }));
   };
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
+  const handleRemoveImage = () => {
+    setFormData((prevState) => ({
+      ...prevState,
+      image: null,
+    }));
   };
 
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const onSave = () => {
-    const categoryData = {
-      image,
-      name,
-      description,
-    };
-    handleSave(categoryData);
-    handleClose();
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('description', formData.description);
+    if (formData.image) {
+      formDataToSend.append('image', formData.image);
+    }
+
+    try {
+      await dispatch(createCategory(formDataToSend)).unwrap();
+      // Clear the form after successful submission
+      setFormData({
+        name: '',
+        description: '',
+        image: null,
+      });
+      handleClose();
+    } catch (error) {
+      console.error('Error creating category:', error);
+    }
   };
 
   return (
@@ -76,50 +114,65 @@ export default function CategoryModal({ open, handleClose, handleSave }) {
           }}
           noValidate
           autoComplete="off"
+          onSubmit={handleSubmit}
         >
-          <label htmlFor="upload-image">
-            <Input accept="image/*" id="upload-image" type="file" onChange={handleImageChange} />
-            <Button variant="contained" component="span" sx={{ mb: 2 }}>
-              Upload Image
-            </Button>
-          </label>
-          {image && (
-            <Box
-              sx={{
-                width: '100%',
-                mb: 2,
-                borderRadius: 1,
-                overflow: 'hidden',
-                boxShadow: 1,
-              }}
-            >
-              <img src={image} alt="category" style={{ width: '100%' }} />
-            </Box>
-          )}
-          <TextField
-            id="name"
-            label="Name"
-            variant="outlined"
-            value={name}
-            onChange={handleNameChange}
-          />
-          <TextField
-            id="description"
-            label="Description"
-            variant="outlined"
-            multiline
-            rows={4}
-            value={description}
-            onChange={handleDescriptionChange}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-            <Button variant="outlined" color="secondary" onClick={handleClose} sx={{ mr: 2 }}>
-              Cancel
-            </Button>
-            <Button variant="contained" color="primary" onClick={onSave}>
-              Save
-            </Button>
-          </Box>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                name="name"
+                label="Name"
+                variant="outlined"
+                fullWidth
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                name="description"
+                label="Description"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={4}
+                value={formData.description}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <input
+                accept="image/*"
+                id="image-input"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+              <label htmlFor="image-input">
+                <Button variant="contained" component="span">
+                  Upload Image
+                </Button>
+              </label>
+              {formData.image && (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <img
+                    src={URL.createObjectURL(formData.image)}
+                    alt="Selected"
+                    style={{ width: '50%', height: 'auto', marginRight: '1rem' }}
+                  />
+                  <Button variant="outlined" onClick={handleRemoveImage}>
+                    Remove Image
+                  </Button>
+                </Box>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Button type="submit" variant="contained" color="primary" fullWidth>
+                Add Category
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Modal>
