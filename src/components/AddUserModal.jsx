@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { red, green } from '@mui/material/colors';
 import CloseIcon from '@mui/icons-material/Close';
-import { createUser, fetchAllUsers } from '../features/userSlice';
+import { createUser } from '../features/userSlice';
 
 const AddUserModal = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
-
-  useEffect(() => {
-    dispatch(fetchAllUsers()); // Fetch all users when the component mounts
-  }, [dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,9 +20,9 @@ const AddUserModal = ({ open, setOpen }) => {
       console.log("Username is required");
       return;
     }
-    dispatch(createUser(userData));
-    dispatch(fetchAllUsers()); // Dispatch fetchAllUsers after creating a new user
-    setOpen(false);
+    dispatch(createUser(userData)).then(() => {
+      setOpen(false);
+    });
   };
 
   const handleClose = () => {

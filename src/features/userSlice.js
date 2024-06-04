@@ -13,12 +13,13 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
+
 export const fetchAllUsers = createAsyncThunk(
   "user/fetchAllUsers",
   async (_, thunkAPI) => {
     try {
-      const users = await userApi.getAllUsersCtrl();
-      return users;
+      const response = await userApi.getAllUsersCtrl();
+      return response.data; // Adjusting to match the provided data structure
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -41,8 +42,8 @@ export const createUser = createAsyncThunk(
   "user/createUser",
   async (userData, thunkAPI) => {
     try {
-      const newUser = await userApi.registerUserCtrl(userData);
-      return newUser;
+      const response = await userApi.registerUserCtrl(userData);
+      return response.data; // Adjusting to match the provided data structure
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -102,9 +103,10 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createUser.fulfilled, (state) => {
+      .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle user creation success without affecting current user state
+        // Directly add the new user to the users array
+        state.users.push(action.payload);
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
@@ -130,8 +132,8 @@ const userSlice = createSlice({
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload; 
-      })      
+        state.users = action.payload;
+      })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

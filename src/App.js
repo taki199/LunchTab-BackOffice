@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { themeSettings } from "./theme";
 import { useSelector, useDispatch } from "react-redux";
-import { BrowserRouter, Route, Routes, Navigate ,useParams} from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import Layout from "./scenes/layout";
 import Dashboard from "./scenes/dashboard";
 import Login from "./scenes/login";
@@ -16,6 +16,31 @@ import Profile from './scenes/Profile';
 import { Toast } from './components/Toast';
 import AddDishForm from './scenes/addDish'
 import UpdateDishForm from './scenes/updateDish';
+import Ai from './scenes/ai'
+import UpdateCategoryForm from './scenes/updateCategory';
+import Monthly from './scenes/monthly';
+import Daily from './scenes/daily'
+import Overview from './scenes/overview'
+// Create a new theme for the login page
+const loginTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#333',
+    },
+    secondary: {
+      main: '#666',
+    },
+  },
+});
+
+// Wrap the login page with the new theme
+const LoginWrapper = () => {
+  return (
+    <ThemeProvider theme={loginTheme}>
+      <Login />
+    </ThemeProvider>
+  );
+};
 
 export default function App() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
@@ -48,27 +73,32 @@ export default function App() {
 
   return (
     <div className="app">
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
           <Routes>
-            <Route element={<Login />} path="/login" />
-            <Route element={<ProtectedRoute />}>
+            <Route element={<LoginWrapper />} path="/login" />
+            <Route element={<ProtectedRoute />} path="/">
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/customers" element={<Customer />} />
+              <Route path="/monthly" element={<Monthly />} />
+              <Route path="/overview" element={<Overview />} />
+              <Route path="/daily" element={<Daily />} />
               <Route path="/products" element={<Dish />} />
               <Route path="/products/addDish" element={<AddDishForm />} />
               <Route path="/products/updateDish/:dishId" element={<UpdateDishFormWrapper />} />
               <Route path="/category" element={<Category />} />
+              <Route path="/category/UpdateCategory/:categoryId" element={<UpdateCategoryForm />} />
+              <Route path="/ai" element={<Ai />} />
               <Route path='/profile/me' element={<Profile />} />
             </Route>
           </Routes>
-        </ThemeProvider>
-        <Toast/>
-      </BrowserRouter>
+          <Toast/>
+        </BrowserRouter>
+      </ThemeProvider>
     </div>
   );
 }
@@ -76,6 +106,11 @@ export default function App() {
 const UpdateDishFormWrapper = () => {
   const { dishId } = useParams();
   return <UpdateDishForm dishId={dishId} />;
+};
+
+const UpdateCategoryFormWrapper = () => {
+  const { categoryId } = useParams();
+  return <UpdateCategoryForm categoryId={categoryId} />;
 };
 
 // Define ProtectedRoute component

@@ -3,55 +3,50 @@ import {
   Box,
   Button,
   TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   CircularProgress,
   Typography,
   Grid,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllCategories } from '../../features/categorySlice';
-import { fetchDishes, updateDish } from '../../features/dishSlice';
+import { fetchAllCategories, updateCategory } from '../../features/categorySlice';
 import { notifySuccess, notifyError } from '../../components/Toast';
 
-const UpdateDishForm = ({ dishId }) => {
+const UpdateCategoryForm = ({ categoryId }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: '',
-    category: '',
-    stock: '',
     image: null,
   });
   const [currentImageUrl, setCurrentImageUrl] = useState(null);
 
   const dispatch = useDispatch();
-  const { categories, loading: categoriesLoading, error: categoriesError } = useSelector((state) => state.category);
-  const { dishes, loading: dishesLoading, error: dishesError, updating, updateError } = useSelector((state) => state.dish);
+  const { loading: categoriesLoading, error: categoriesError } = useSelector((state) => state.category);
 
   useEffect(() => {
     dispatch(fetchAllCategories());
-    dispatch(fetchDishes());
   }, [dispatch]);
 
   useEffect(() => {
-    if (dishes.length > 0) {
-      const dish = dishes.find(d => d._id === dishId);
-      if (dish) {
-        setFormData({
-          name: dish.name,
-          description: dish.description,
-          price: dish.price,
-          category: dish.category._id, // Assuming category is an object with _id and name
-          stock: dish.stock,
-          image: null, // Handle image separately
-        });
-        setCurrentImageUrl(dish.image.url); // Set current image URL
-      }
-    }
-  }, [dishes, dishId]);
+    // Fetch category data and update the form state
+    // For simplicity, assuming categories are fetched elsewhere and stored in Redux store
+    // Replace this with actual logic to fetch category details
+    const categoryData = {
+      _id: categoryId,
+      name: 'Category Name', // Replace with actual category name
+      description: 'Category Description', // Replace with actual category description
+      // Add other fields if needed
+    };
+
+    // Update form state with fetched category data
+    setFormData({
+      name: categoryData.name,
+      description: categoryData.description,
+      image: null, // Handle image separately
+    });
+    // Set current image URL if available
+    // Replace 'categoryData.image.url' with the actual URL field
+    setCurrentImageUrl(categoryData.image ? categoryData.image.url : null);
+  }, [categoryId]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -78,47 +73,32 @@ const UpdateDishForm = ({ dishId }) => {
     setCurrentImageUrl(null); // Remove current image preview
   };
 
-  const handleCategoryChange = (event) => {
-    const selectedCategoryId = event.target.value;
-    setFormData((prevState) => ({
-      ...prevState,
-      category: selectedCategoryId,
-    }));
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const formDataToSend = new FormData();
     formDataToSend.append('name', formData.name);
     formDataToSend.append('description', formData.description);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('category', formData.category);
-    formDataToSend.append('stock', formData.stock);
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
 
     try {
-      await dispatch(updateDish({ id: dishId, credentials: formDataToSend })).unwrap();
+      await dispatch(updateCategory({ id: categoryId, categoryData: formDataToSend })).unwrap();
       // Optionally clear the form or show a success message
-      notifySuccess('order Updated Successfully')
+      notifySuccess('Category Updated Successfully');
     } catch (error) {
-      console.error('Error updating dish:', error);
-      notifyError('Error updating dish')
+      console.error('Error updating category:', error);
+      notifyError('Error updating category');
     }
   };
-
-  if (dishesLoading) {
-    return <CircularProgress />;
-  }
 
   return (
     <Box sx={{ padding: '2rem' }} component="form" onSubmit={handleSubmit}>
       <Typography variant="h4" gutterBottom>
-        Update Dish
+        Update Category
       </Typography>
-      {(categoriesError || dishesError || updateError) && <Typography color="error">{categoriesError || dishesError || updateError}</Typography>}
+      {categoriesError && <Typography color="error">{categoriesError}</Typography>}
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
@@ -143,43 +123,6 @@ const UpdateDishForm = ({ dishId }) => {
             onChange={handleInputChange}
             required
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            name="price"
-            label="Price"
-            variant="outlined"
-            type="number"
-            fullWidth
-            value={formData.price}
-            onChange={handleInputChange}
-            required
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <FormControl fullWidth>
-            <InputLabel id="category-label">Category</InputLabel>
-            <Select
-              name="category"
-              labelId="category-label"
-              value={formData.category || ''}
-              onChange={handleCategoryChange}
-              required
-              disabled={categoriesLoading}
-            >
-              {categoriesLoading ? (
-                <MenuItem disabled value="">
-                  <CircularProgress size={24} />
-                </MenuItem>
-              ) : (
-                categories.map((category) => (
-                  <MenuItem key={category._id} value={category._id}>
-                    {category.name}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
           <input
@@ -207,27 +150,14 @@ const UpdateDishForm = ({ dishId }) => {
             </Box>
           )}
         </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            name="stock"
-            label="Stock"
-            variant="outlined"
-            type="number"
-            fullWidth
-            value={formData.stock}
-            onChange={handleInputChange}
-            required
-          />
-        </Grid>
         <Grid item xs={12}>
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            disabled={updating}
           >
-            {updating ? <CircularProgress size={24} /> : 'Update Dish'}
+            Update Category
           </Button>
         </Grid>
       </Grid>
@@ -235,4 +165,4 @@ const UpdateDishForm = ({ dishId }) => {
   );
 };
 
-export default UpdateDishForm;
+export default UpdateCategoryForm;

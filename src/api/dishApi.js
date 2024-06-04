@@ -67,5 +67,25 @@ export const dishApi = {
     } catch (error) {
       throw new Error(error.response.data.message);
     }
+  },
+
+  //Dish Count 
+  //http://localhost:5001/api/dishes/my-count/my-dishes
+  
+};
+
+export const countDish= async (token) => {
+  try {
+   
+    const response = await axios.get(`http://localhost:5001/api/dishes/my-count/my-dishes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error counting dishes:', error);
+    throw new Error(error.response?.data?.message || 'An error occurred while counting dishes.');
   }
 };

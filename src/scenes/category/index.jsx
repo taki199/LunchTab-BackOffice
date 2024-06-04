@@ -16,55 +16,57 @@ import {
   Pagination,
 } from '@mui/material';
 import Header from '../../components/Header';
-import CategoryModal from '../../components/CategoryModal'; // Import CategoryModal
-import { fetchAllCategories } from '../../features/categorySlice';
+import { fetchAllCategories, deleteCategory } from '../../features/categorySlice';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import { Link,useNavigate } from 'react-router-dom';
 
 export default function Category() {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.category.categories);
-
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [currentCategory, setCurrentCategory] = React.useState(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
-  const handleSaveCategory = (categoryData) => {
-    // Handle saving the new category
-    console.log('Saved category:', categoryData);
-  };
   React.useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setCurrentCategory(null);
+    // Re-fetch categories to ensure the list is updated
+    dispatch(fetchAllCategories());
   };
 
+  const handleUpdateClick = (categoryId) => {
+    navigate(`/category/updateCategory/${categoryId}`);
+  }
 
-  // Function to paginate categories
+  const handleAddCategory = () => {
+    setCurrentCategory(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (categoryId) => {
+    dispatch(deleteCategory(categoryId));
+  };
+
   const paginateCategories = (items, pageNumber, pageSize) => {
     const startIndex = (pageNumber - 1) * pageSize;
     return items.slice(startIndex, startIndex + pageSize);
   };
 
-  // Constants for pagination
   const pageSize = 4;
   const totalPages = Math.ceil(categories.length / pageSize);
 
-  // State for current page
-  const [currentPage, setCurrentPage] = React.useState(1);
-
-  // Function to handle page change
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
-  // Paginate categories for current page
   const paginatedCategories = paginateCategories(categories, currentPage, pageSize);
-
-  const handleAddCategory = () => {
-    setIsModalOpen(true);
-  };
 
   return (
     <Box m="1.5rem 5px">
@@ -111,16 +113,22 @@ export default function Category() {
                 </TableCell>
                 <TableCell>
                   <Box display="flex">
-                    <Button variant="contained" color="secondary" startIcon={<EditIcon />}>Edit</Button>
+                  <Button variant="contained" color="secondary" startIcon={<EditIcon />}  onClick={() => handleUpdateClick(category._id)}>Edit</Button>
                     <Box ml={2} />
-                    <Button variant="contained" color="error" startIcon={<DeleteIcon />}>Delete</Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDeleteClick(category._id)}
+                      startIcon={<DeleteIcon />}
+                    >
+                      Delete
+                    </Button>
                   </Box>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        {/* Pagination */}
         <Box mt="20px" display="flex" justifyContent="center">
           <Pagination
             count={totalPages}
@@ -133,11 +141,7 @@ export default function Category() {
           />
         </Box>
       </TableContainer>
-      <CategoryModal
-       open={isModalOpen}
-       handleClose={handleCloseModal}
-       handleSave={handleSaveCategory}
-      />
+  
     </Box>
   );
 }
