@@ -3,7 +3,9 @@ import { CircularProgress, TextField, Box, Button, Typography } from '@mui/mater
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AiwithText = () => {
-    const genAI = new GoogleGenerativeAI('AIzaSyDXe-79fVCDAfv1gz4ceqH5ubENycwWanI');
+
+    // Gimini APi Key 
+    const genAI = new GoogleGenerativeAI('Make sure You Put your Api Here ');
 
     const [search, setSearch] = useState('');
     const [aiResponse, setResponse] = useState([]);
