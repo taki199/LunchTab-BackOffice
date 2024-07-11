@@ -5,7 +5,7 @@ import { getBase64 } from '../helpers/imageHelper';
 
 const AiwithImage = () => {
     const theme = useTheme();
-    const genAI = new GoogleGenerativeAI('AIzaSyDXe-79fVCDAfv1gz4ceqH5ubENycwWanI');
+    const genAI = new GoogleGenerativeAI('Your API');
 
     const [image, setImage] = useState('');
     const [imageInlineData, setImageInlineData] = useState('');
