@@ -63,7 +63,7 @@ const Products = () => {
       headerClassName: 'font-bold text-lg font-[poppins]',
       renderCell: (params) => (
         <TableCell style={{ width: '160px', height: '400px' }}>
-          <img src={params.row.image.url} alt="Dish" style={{ width: '140px', height: '100px', objectFit: 'cover', marginLeft: '40px', marginBottom: '20px', marginTop: '-5px', borderRadius: "10px" }} />
+          <img src={params.row.image?.url} alt="Dish" style={{ width: '140px', height: '100px', objectFit: 'cover', marginLeft: '40px', marginBottom: '20px', marginTop: '-5px', borderRadius: "10px" }} />
         </TableCell>
       ),
     },
@@ -136,7 +136,7 @@ const Products = () => {
               dishes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((dish) => (
                 <TableRow key={dish._id}>
                   <TableCell>
-                    <img src={dish.image.url} alt="Dish" style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: "10px" }} />
+                    <img src={dish.image?.url} alt="Dish" style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: "10px" }} />
                   </TableCell>
                   <TableCell>{dish.name}</TableCell>
                   <TableCell>{dish.category ? dish.category.name : 'N/A'}</TableCell>

@@ -58,4 +58,12 @@ export const userApi = {
       throw new Error(error.response.data.message);
     }
   },
+  updateUserProfile: async (userId, userData) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/users/profile/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message || 'Failed to update user profile. Please try again.');
+    }
+  },
 };

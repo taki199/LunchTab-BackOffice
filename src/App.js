@@ -21,6 +21,8 @@ import UpdateCategoryForm from './scenes/updateCategory';
 import Monthly from './scenes/monthly';
 import Daily from './scenes/daily'
 import Overview from './scenes/overview'
+import Loader from './components/Loader'
+import InvoicePage from './scenes/invoice';
 // Create a new theme for the login page
 const loginTheme = createTheme({
   palette: {
@@ -85,8 +87,9 @@ export default function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/customers" element={<Customer />} />
               <Route path="/monthly" element={<Monthly />} />
-              <Route path="/overview" element={<Overview />} />
+              <Route path="/trackusers" element={<Overview />} />
               <Route path="/daily" element={<Daily />} />
+              <Route path="/invoice" element={<InvoicePage />} />
               <Route path="/products" element={<Dish />} />
               <Route path="/products/addDish" element={<AddDishForm />} />
               <Route path="/products/updateDish/:dishId" element={<UpdateDishFormWrapper />} />

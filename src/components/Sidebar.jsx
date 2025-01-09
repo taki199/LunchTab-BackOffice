@@ -23,9 +23,11 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import FlexBetween from './FlexBetween';
 import profileImage from "../assets/profile.jpg";
-import { useSelector } from 'react-redux';
+import { useSelector ,useDispatch} from 'react-redux';
 import Logo from './Logo'
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import { updateUser } from '../features/userSlice'; // Import `updateUser` action
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 
 const navItems = [
     {
@@ -56,7 +58,11 @@ const navItems = [
     },
    
     {
-      text: "Overview",
+      text: "TrackUsers",
+      icon: <LocationSearchingIcon />,
+    },
+    {
+      text: "invoice",
       icon: <PointOfSaleOutlined />,
     },
     {
@@ -71,10 +77,10 @@ const navItems = [
       text: "Monthly",
       icon: <CalendarMonthOutlined />,
     },
-    {
-      text: "Breakdown",
-      icon: <PieChartOutlined />,
-    },
+    // {
+    //   text: "Breakdown",
+    //   icon: <PieChartOutlined />,
+    // },
     
     {
       text: "Admin",
@@ -88,6 +94,8 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
   const user = useSelector((state) => state.user.user || {}); // Access user data from Redux store, initialize with empty object if not available
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useDispatch(); // Add useDispatch hook
+
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
@@ -98,6 +106,11 @@ const Sidebar = ({ drawerWidth, isSidebarOpen, setIsSidebarOpen, isNonMobile }) 
     profilePhoto: { url: "default-profile-image.jpg" },
     role: "Guest",
   };
+  const handleUserUpdate = (updatedUser) => {
+    // Dispatch an action to update the user data in Redux store
+    dispatch(updateUser(updatedUser));
+};
+
 
   return (
     <Box component="nav">

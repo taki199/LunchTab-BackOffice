@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { LightModeOutlined, DarkModeOutlined, Menu as MenuIcon, Search, SettingsOutlined, ArrowDropDownOutlined } from '@mui/icons-material';
 import FlexBetween from './FlexBetween';
-import { useDispatch } from 'react-redux';
 import { setMode } from '../state';
-import profileImage from "../assets/profile.jpg";
 import { AppBar, IconButton, InputBase, Toolbar, useTheme, Box, Menu, MenuItem, Button, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { updateUser, logoutUser } from '../features/userSlice'; // Import `updateUser` and `logoutUser` actions
+import { useNavigate } from 'react-router-dom';
+import { notifySuccess, notifyError } from '../components/Toast'; // Import the toast functions
 
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const dispatch = useDispatch();
@@ -19,17 +19,32 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
     const theme = useTheme();
-    const user = useSelector((state) => state.user.user); // Access user data from Redux store
+    const user = useSelector((state) => state.user.user);
+    const navigate = useNavigate(); // Access the navigate function
 
     useEffect(() => {
         setActive(pathname.substring(1));
     }, [pathname]);
 
-    // Default user data if not available from the backend
     const defaultUser = {
         username: "Guest",
         profilePhoto: { url: "default-profile-image.jpg" },
         role: "Guest",
+    };
+
+    const handleUserUpdate = (updatedUser) => {
+        notifySuccess('Logged out successfully'); // Show success toast after logging out
+
+        dispatch(updateUser(updatedUser));
+    };
+
+    const handleLogout = () => {
+        dispatch(logoutUser());
+        notifySuccess('Logged out successfully'); // Show success toast after logging out
+
+        navigate('/login'); // Redirect to the login page after logout
+
+        // Additional logic for redirecting or showing a message after logout can be added here
     };
 
     return (
@@ -41,7 +56,6 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             }}
         >
             <Toolbar sx={{ justifyContent: "space-between" }}>
-                {/* LEFT SIDE */}
                 <FlexBetween>
                     <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                         <MenuIcon />
@@ -58,8 +72,6 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         </IconButton>
                     </FlexBetween>
                 </FlexBetween>
-
-                {/* RIGHT SIDE */}
                 <FlexBetween gap="1.5rem">
                     <IconButton onClick={() => dispatch(setMode())}>
                         {theme.palette.mode === "light" ? (
@@ -71,7 +83,6 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <IconButton>
                         <SettingsOutlined sx={{ fontSize: "25px" }} />
                     </IconButton>
-
                     <FlexBetween>
                         <Button
                             onClick={handleClick}
@@ -118,7 +129,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                         >
                             <MenuItem component={Link} to="/profile/me">Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>Log Out</MenuItem>
+                            <MenuItem onClick={handleLogout}>Log Out</MenuItem> {/* Call handleLogout when Log Out is clicked */}
                         </Menu>
                     </FlexBetween>
                 </FlexBetween>
