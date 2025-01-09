@@ -34,7 +34,7 @@ const Orders = () => {
 
   const columns = [
     {
-      field: "_id",
+      field: "orderNumber",
       headerName: "ID",
       flex: 1,
       headerClassName: 'font-bold text-lg font-[poppins]',
@@ -146,17 +146,18 @@ const Orders = () => {
         }}
       >
         <DataGrid
-          rows={orders.map((order) => {
-            const totalQuantity = order.orderItems.reduce((total, item) => total + item.quantity, 0);
-
-            return {
-              ...order,
-              totalAmount: `$${order.totalAmount}`,
-              customerUsername: order.customer ? order.customer.username : 'N/A',
-              quantity: order.orderItems.map((item) => `${item.quantity} `),
-              orderItems: order.orderItems.map((item) => `${item.dishId.name} (*${item.quantity})`).join(", "),
-            };
-          })}
+        rows={orders.map((order, index) => {
+          const totalQuantity = order.orderItems.reduce((total, item) => total + item.quantity, 0);
+        
+          return {
+            ...order,
+            orderNumber: `100${index + 1}`, // Generate custom order numbers starting from 1001
+            totalAmount: `$${order.totalAmount}`,
+            customerUsername: order.customer ? order.customer.username : 'N/A',
+            quantity: order.orderItems.map((item) => `${item.quantity} `),
+            orderItems: order.orderItems.map((item) => `${item.dishId.name} `).join(", "),
+          };
+        })}
           columns={columns}
           getRowId={(row) => row._id}
           components={{ ColumnMenu: CustomColumnMenu }}

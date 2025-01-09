@@ -73,6 +73,17 @@ export const changePhoto = createAsyncThunk(
     }
   }
 );
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async ({ userId, userData }, thunkAPI) => {
+    try {
+      const updatedUser = await userApi.updateUserProfile(userId, userData);
+      return updatedUser;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
 
 export const setAuthenticated = (isAuthenticated) => {
   return {
@@ -177,6 +188,18 @@ const userSlice = createSlice({
         state.user.profilePhoto = action.payload.profilePhoto;
       })
       .addCase(changePhoto.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

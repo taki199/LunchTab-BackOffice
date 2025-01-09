@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-  mode: "dark",
+  mode: "light",
   status: 'idle',
   error: null,
 };

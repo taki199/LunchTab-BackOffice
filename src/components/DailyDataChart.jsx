@@ -35,7 +35,8 @@ const DailyDataChart = () => {
         setDailyCustomers(dailyCustomersData);
     };
 
-    if (customers && customers.data.length > 0) {
+     // instead of checking customers.data.length>0 i changed it to just customers.data
+    if (customers && customers.data) {
         console.log('Fetched customers:', customers.data);
         calculateDailyCustomers();
     }
@@ -59,7 +60,7 @@ const DailyDataChart = () => {
       const dailyOrdersData = Array.from(dailyOrdersMap, ([date, count]) => ({ date, count }));
       setDailyOrders(dailyOrdersData);
     };
-
+     
     if (orders.length > 0) {
       calculateDailyOrders();
     }

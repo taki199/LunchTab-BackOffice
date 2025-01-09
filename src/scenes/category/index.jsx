@@ -1,57 +1,33 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import {
-  Box,
-  Button,
-  Card,
-  CardMedia,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Pagination,
-} from '@mui/material';
-import Header from '../../components/Header';
-import { fetchAllCategories, deleteCategory } from '../../features/categorySlice';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { Link,useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Box, Button, Typography, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Pagination, IconButton, Snackbar } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllCategories, deleteCategory } from "../../features/categorySlice";
+import { Add, Edit, Delete } from "@mui/icons-material";
+import Header from "../../components/Header";
+import { Link, useNavigate } from 'react-router-dom';
+import CategoryModal from "../../components/CategoryModal";
 
-export default function Category() {
+const Category = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.category.categories);
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [currentCategory, setCurrentCategory] = React.useState(null);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const pageSize = 4;
+  const totalPages = Math.ceil(categories.length / pageSize);
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setCurrentCategory(null);
-    // Re-fetch categories to ensure the list is updated
-    dispatch(fetchAllCategories());
-  };
 
   const handleUpdateClick = (categoryId) => {
     navigate(`/category/updateCategory/${categoryId}`);
   }
 
-  const handleAddCategory = () => {
-    setCurrentCategory(null);
-    setIsModalOpen(true);
-  };
-
   const handleDeleteClick = (categoryId) => {
     dispatch(deleteCategory(categoryId));
+    setIsToastOpen(true);
   };
 
   const paginateCategories = (items, pageNumber, pageSize) => {
@@ -59,34 +35,41 @@ export default function Category() {
     return items.slice(startIndex, startIndex + pageSize);
   };
 
-  const pageSize = 4;
-  const totalPages = Math.ceil(categories.length / pageSize);
-
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
   const paginatedCategories = paginateCategories(categories, currentPage, pageSize);
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleToastClose = () => {
+    setIsToastOpen(false);
+  };
+
   return (
     <Box m="1.5rem 5px">
       <Header
         title="Category"
-        subtitle={<Typography sx={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}>Managing category and list of categories</Typography>}
+        subtitle={<Typography sx={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}>Managing categories and list of categories</Typography>}
       />
       <Box mt="20px" display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.5rem', fontFamily: 'Poppins' }}>Categories</Typography>
-        <Box display="flex" alignItems="center">
-          <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={handleAddCategory}>
-            Add
-          </Button>
-        </Box>
+        <Button variant="contained" color="secondary" startIcon={<Add />} onClick={handleModalOpen}>
+          Add Category
+        </Button>
       </Box>
       <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-        <Table aria-label="categories table" sx={{ minWidth: 650 }}>
+        <Table aria-label="categories table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Category</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Image</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Name</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Description</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'Poppins' }}>Actions</TableCell>
@@ -96,34 +79,17 @@ export default function Category() {
             {paginatedCategories.map((category) => (
               <TableRow key={category._id}>
                 <TableCell>
-                  <Card sx={{ maxWidth: 140 }}>
-                    <CardMedia
-                      component="img"
-                      alt={category.name}
-                      height="140"
-                      image={category.image.url}
-                    />
-                  </Card>
+                  <img src={category.image.url} alt={category.name} style={{ width: '140px', height: '100px', objectFit: 'cover', borderRadius: "10px" }} />
                 </TableCell>
                 <TableCell>{category.name}</TableCell>
+                <TableCell>{category.description || 'No description available'}</TableCell>
                 <TableCell>
-                  <Typography variant="body2" color="text.secondary">
-                    {category.description ? category.description : 'some description'}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Box display="flex">
-                  <Button variant="contained" color="secondary" startIcon={<EditIcon />}  onClick={() => handleUpdateClick(category._id)}>Edit</Button>
-                    <Box ml={2} />
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDeleteClick(category._id)}
-                      startIcon={<DeleteIcon />}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
+                  <IconButton color="green" aria-label="edit category" onClick={() => handleUpdateClick(category._id)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton color="error" aria-label="delete category" onClick={() => handleDeleteClick(category._id)}>
+                    <Delete />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -135,13 +101,25 @@ export default function Category() {
             page={currentPage}
             onChange={handlePageChange}
             color="primary"
-            siblingCount={1}
-            boundaryCount={1}
             size="large"
+            showFirstButton
+            showLastButton
           />
         </Box>
       </TableContainer>
-  
+      <CategoryModal open={isModalOpen} handleClose={handleModalClose} />
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={isToastOpen}
+        autoHideDuration={6000}
+        onClose={handleToastClose}
+        message="Category deleted successfully"
+      />
     </Box>
   );
-}
+};
+
+export default Category;

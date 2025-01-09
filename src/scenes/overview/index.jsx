@@ -38,8 +38,8 @@ const ActivityLogDashboard = () => {
             <TableCell>ID</TableCell>
             <TableCell>User ID</TableCell>
             <TableCell>Type of Action</TableCell>
-            <TableCell>Path</TableCell>
             <TableCell>Time</TableCell>
+            <TableCell>Path</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
